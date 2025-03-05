@@ -31,14 +31,14 @@ type
     FRoot: TRedBlackNode<K, V>;
     Comparer: IComparer<K>;
 
-    procedure InOrder(Node: TRedBlackNode<K, V>);
+    procedure InOrder(const Node: TRedBlackNode<K, V>);
 
     procedure RotateLeft(Node: TRedBlackNode<K, V>);
     procedure RotateRight(Node: TRedBlackNode<K, V>);
     procedure FixInsert(Node: TRedBlackNode<K, V>);
     procedure FreeNodes(Node: TRedBlackNode<K, V>);
 
-    procedure DoDumpProc(Node: TRedBlackNode<K, V>);
+    procedure DoDumpProc(const Node: TRedBlackNode<K, V>);
   public
     constructor Create;
     destructor Destroy; override;
@@ -67,19 +67,19 @@ var
 begin
   case GetTypeKind(Key) of
     tkClass:
-    begin
-      LKey := @Key;
-      FreeAndNil(LKey^);
-    end;
+      begin
+        LKey := @Key;
+        FreeAndNil(LKey^);
+      end;
   else
     FKey := Default(K);
   end;
   case GetTypeKind(Value) of
     tkClass:
-    begin
-      LValue := @Value;
-      FreeAndNil(LValue^);
-    end;
+      begin
+        LValue := @Value;
+        FreeAndNil(LValue^);
+      end;
   else
     FValue := Default(V);
   end;
@@ -117,10 +117,9 @@ begin
     Temp.Left.FParent := Node;
   Temp.FParent := Node.Parent;
   if Node.Parent = nil then
-    FRoot := Temp
-  else if Node = Node.Parent.Left then
-    Node.Parent.Left := Temp
-  else
+    FRoot := Temp else
+  if Node = Node.Parent.Left then
+    Node.Parent.Left := Temp else
     Node.Parent.Right := Temp;
   Temp.Left := Node;
   Node.FParent := Temp;
@@ -136,10 +135,9 @@ begin
     Temp.Right.FParent := Node;
   Temp.FParent := Node.Parent;
   if Node.Parent = nil then
-    FRoot := Temp
-  else if Node = Node.Parent.Right then
-    Node.Parent.Right := Temp
-  else
+    FRoot := Temp else
+  if Node = Node.Parent.Right then
+    Node.Parent.Right := Temp else
     Node.Parent.Left := Temp;
   Temp.Right := Node;
   Node.FParent := Temp;
@@ -150,52 +148,49 @@ var
   Uncle: TRedBlackNode<K, V>;
 begin
   while (Node.Parent <> nil) and (Node.Parent.Colour = crRed) do
-  begin
-    if Node.Parent = Node.Parent.Parent.Left then
     begin
-      Uncle := Node.Parent.Parent.Right;
-      if (Uncle <> nil) and (Uncle.Colour = crRed) then
-      begin
-        Node.Parent.Colour := crBlack;
-        Uncle.Colour := crBlack;
-        Node.Parent.Parent.Colour := crRed;
-        Node := Node.Parent.Parent;
-      end
-      else
-      begin
-        if Node = Node.Parent.Right then
+      if Node.Parent = Node.Parent.Parent.Left then
         begin
-          Node := Node.Parent;
-          RotateLeft(Node);
-        end;
-        Node.Parent.Colour := crBlack;
-        Node.Parent.Parent.Colour := crRed;
-        RotateRight(Node.Parent.Parent);
-      end;
-    end
-    else
-    begin
-      Uncle := Node.Parent.Parent.Left;
-      if (Uncle <> nil) and (Uncle.Colour = crRed) then
-      begin
-        Node.Parent.Colour := crBlack;
-        Uncle.Colour := crBlack;
-        Node.Parent.Parent.Colour := crRed;
-        Node := Node.Parent.Parent;
-      end
-      else
-      begin
-        if Node = Node.Parent.Left then
+          Uncle := Node.Parent.Parent.Right;
+          if (Uncle <> nil) and (Uncle.Colour = crRed) then
+            begin
+              Node.Parent.Colour := crBlack;
+              Uncle.Colour := crBlack;
+              Node.Parent.Parent.Colour := crRed;
+              Node := Node.Parent.Parent;
+            end else
+            begin
+              if Node = Node.Parent.Right then
+                begin
+                  Node := Node.Parent;
+                  RotateLeft(Node);
+                end;
+              Node.Parent.Colour := crBlack;
+              Node.Parent.Parent.Colour := crRed;
+              RotateRight(Node.Parent.Parent);
+            end;
+        end else
         begin
-          Node := Node.Parent;
-          RotateRight(Node);
+          Uncle := Node.Parent.Parent.Left;
+          if (Uncle <> nil) and (Uncle.Colour = crRed) then
+            begin
+              Node.Parent.Colour := crBlack;
+              Uncle.Colour := crBlack;
+              Node.Parent.Parent.Colour := crRed;
+              Node := Node.Parent.Parent;
+            end else
+            begin
+              if Node = Node.Parent.Left then
+                begin
+                  Node := Node.Parent;
+                  RotateRight(Node);
+                end;
+              Node.Parent.Colour := crBlack;
+              Node.Parent.Parent.Colour := crRed;
+              RotateLeft(Node.Parent.Parent);
+            end;
         end;
-        Node.Parent.Colour := crBlack;
-        Node.Parent.Parent.Colour := crRed;
-        RotateLeft(Node.Parent.Parent);
-      end;
     end;
-  end;
   FRoot.Colour := crBlack;
 end;
 
@@ -209,22 +204,20 @@ begin
   begin
     Parent := Node;
     if Comparer.Compare(AKey, Node.Key) < 0 then
-      Node := Node.Left
-    else
+      Node := Node.Left else
       Node := Node.Right;
   end;
   NewNode := TRedBlackNode<K, V>.Create(AKey, AValue, crRed);
   NewNode.FParent := Parent;
   if Parent = nil then
-    FRoot := NewNode
-  else if Comparer.Compare(AKey, Parent.Key) < 0 then
-    Parent.Left := NewNode
-  else
+    FRoot := NewNode else
+  if Comparer.Compare(AKey, Parent.Key) < 0 then
+    Parent.Left := NewNode else
     Parent.Right := NewNode;
   FixInsert(NewNode);
 end;
 
-procedure TRedBlackTree<K, V>.InOrder(Node: TRedBlackNode<K, V>);
+procedure TRedBlackTree<K, V>.InOrder(const Node: TRedBlackNode<K, V>);
 begin
   if Node = nil then
     Exit;
@@ -233,7 +226,7 @@ begin
   InOrder(Node.Right);
 end;
 
-procedure TRedBlackTree<K, V>.DoDumpProc(Node: TRedBlackNode<K, V>);
+procedure TRedBlackTree<K, V>.DoDumpProc(const Node: TRedBlackNode<K, V>);
 begin
   if Assigned(FDumpProc) then
     FDumpProc(Node);
