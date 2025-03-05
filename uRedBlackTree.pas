@@ -109,53 +109,53 @@ end;
 
 procedure TRedBlackTree<K, V>.RotateLeft(Node: TRedBlackNode<K, V>);
 var
-  Temp: TRedBlackNode<K, V>;
+  LTemp: TRedBlackNode<K, V>;
 begin
-  Temp := Node.Right;
-  Node.Right := Temp.Left;
-  if Temp.Left <> nil then
-    Temp.Left.FParent := Node;
-  Temp.FParent := Node.Parent;
+  LTemp := Node.Right;
+  Node.Right := LTemp.Left;
+  if LTemp.Left <> nil then
+    LTemp.Left.FParent := Node;
+  LTemp.FParent := Node.Parent;
   if Node.Parent = nil then
-    FRoot := Temp else
+    FRoot := LTemp else
   if Node = Node.Parent.Left then
-    Node.Parent.Left := Temp else
-    Node.Parent.Right := Temp;
-  Temp.Left := Node;
-  Node.FParent := Temp;
+    Node.Parent.Left := LTemp else
+    Node.Parent.Right := LTemp;
+  LTemp.Left := Node;
+  Node.FParent := LTemp;
 end;
 
 procedure TRedBlackTree<K, V>.RotateRight(Node: TRedBlackNode<K, V>);
 var
-  Temp: TRedBlackNode<K, V>;
+  LTemp: TRedBlackNode<K, V>;
 begin
-  Temp := Node.Left;
-  Node.Left := Temp.Right;
-  if Temp.Right <> nil then
-    Temp.Right.FParent := Node;
-  Temp.FParent := Node.Parent;
+  LTemp := Node.Left;
+  Node.Left := LTemp.Right;
+  if LTemp.Right <> nil then
+    LTemp.Right.FParent := Node;
+  LTemp.FParent := Node.Parent;
   if Node.Parent = nil then
-    FRoot := Temp else
+    FRoot := LTemp else
   if Node = Node.Parent.Right then
-    Node.Parent.Right := Temp else
-    Node.Parent.Left := Temp;
-  Temp.Right := Node;
-  Node.FParent := Temp;
+    Node.Parent.Right := LTemp else
+    Node.Parent.Left := LTemp;
+  LTemp.Right := Node;
+  Node.FParent := LTemp;
 end;
 
 procedure TRedBlackTree<K, V>.FixInsert(Node: TRedBlackNode<K, V>);
 var
-  Uncle: TRedBlackNode<K, V>;
+  LUncle: TRedBlackNode<K, V>;
 begin
   while (Node.Parent <> nil) and (Node.Parent.Colour = crRed) do
     begin
       if Node.Parent = Node.Parent.Parent.Left then
         begin
-          Uncle := Node.Parent.Parent.Right;
-          if (Uncle <> nil) and (Uncle.Colour = crRed) then
+          LUncle := Node.Parent.Parent.Right;
+          if (LUncle <> nil) and (LUncle.Colour = crRed) then
             begin
               Node.Parent.Colour := crBlack;
-              Uncle.Colour := crBlack;
+              LUncle.Colour := crBlack;
               Node.Parent.Parent.Colour := crRed;
               Node := Node.Parent.Parent;
             end else
@@ -171,11 +171,11 @@ begin
             end;
         end else
         begin
-          Uncle := Node.Parent.Parent.Left;
-          if (Uncle <> nil) and (Uncle.Colour = crRed) then
+          LUncle := Node.Parent.Parent.Left;
+          if (LUncle <> nil) and (LUncle.Colour = crRed) then
             begin
               Node.Parent.Colour := crBlack;
-              Uncle.Colour := crBlack;
+              LUncle.Colour := crBlack;
               Node.Parent.Parent.Colour := crRed;
               Node := Node.Parent.Parent;
             end else
@@ -196,25 +196,25 @@ end;
 
 procedure TRedBlackTree<K, V>.Add(AKey: K; AValue: V);
 var
-  Node, Parent, NewNode: TRedBlackNode<K, V>;
+  LNode, LParent, LNewNode: TRedBlackNode<K, V>;
 begin
-  Node := FRoot;
-  Parent := nil;
-  while Node <> nil do
+  LNode := FRoot;
+  LParent := nil;
+  while LNode <> nil do
   begin
-    Parent := Node;
-    if Comparer.Compare(AKey, Node.Key) < 0 then
-      Node := Node.Left else
-      Node := Node.Right;
+    LParent := LNode;
+    if Comparer.Compare(AKey, LNode.Key) < 0 then
+      LNode := LNode.Left else
+      LNode := LNode.Right;
   end;
-  NewNode := TRedBlackNode<K, V>.Create(AKey, AValue, crRed);
-  NewNode.FParent := Parent;
-  if Parent = nil then
-    FRoot := NewNode else
-  if Comparer.Compare(AKey, Parent.Key) < 0 then
-    Parent.Left := NewNode else
-    Parent.Right := NewNode;
-  FixInsert(NewNode);
+  LNewNode := TRedBlackNode<K, V>.Create(AKey, AValue, crRed);
+  LNewNode.FParent := LParent;
+  if LParent = nil then
+    FRoot := LNewNode else
+  if Comparer.Compare(AKey, LParent.Key) < 0 then
+    LParent.Left := LNewNode else
+    LParent.Right := LNewNode;
+  FixInsert(LNewNode);
 end;
 
 procedure TRedBlackTree<K, V>.InOrder(const Node: TRedBlackNode<K, V>);
